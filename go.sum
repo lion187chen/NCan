@@ -1,0 +1,4 @@
+github.com/lion187chen/socketcan-go v1.0.3 h1:AyTXsmd8nFtq2qZ9jhzPBP61PrxOkj1hhXHRTPVeAUA=
+github.com/lion187chen/socketcan-go v1.0.3/go.mod h1:BS2nFHu8zFod1JMcbqTCpBylMilLuELFb4WX4yMPaIE=
+golang.org/x/sys v0.13.0 h1:Af8nKPmuFypiUBjVoU9V20FiaFXOcuZI21p0ycVYYGE=
+golang.org/x/sys v0.13.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
