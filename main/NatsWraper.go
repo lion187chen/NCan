@@ -29,16 +29,12 @@ type NatsWraper struct {
 	user   string
 	passwd string
 	myName string
-
-	subjHandler OnSubjectHandler
 }
 
 type NatsState struct {
 	connected bool
 	sync.RWMutex
 }
-
-type OnSubjectHandler func(nm *nats.Msg, subj string, data []byte)
 
 func (n *NatsState) Write(state bool) {
 	n.RWMutex.Lock()
@@ -54,7 +50,7 @@ func (n *NatsState) Read() bool {
 
 // NatsWraper 构造方法.
 // 返回 NatsWraper 对象指针.
-func (n *NatsWraper) Init(server, user, passwd, myName string, hdl OnSubjectHandler) *NatsWraper {
+func (n *NatsWraper) Init(server, user, passwd, myName string) *NatsWraper {
 	n.NatsState.Write(false)
 
 	if myName == "" {
@@ -69,7 +65,6 @@ func (n *NatsWraper) Init(server, user, passwd, myName string, hdl OnSubjectHand
 	}
 	n.user = user
 	n.passwd = passwd
-	n.subjHandler = hdl
 
 	return n
 }
@@ -120,15 +115,12 @@ func (n *NatsWraper) IsConnected() bool {
 }
 
 // 参数 subj 为接收使用的主题
-func (n *NatsWraper) Subscribe(subj string) {
-	_, e := n.NConn.Subscribe(subj, n.onSubject)
+func (n *NatsWraper) Subscribe(subj string, ch chan *nats.Msg) *nats.Subscription {
+	sub, e := n.NConn.ChanSubscribe(subj, ch)
 	if e != nil {
 		panic(e)
 	}
-}
-
-func (n *NatsWraper) onSubject(m *nats.Msg) {
-	n.subjHandler(m, m.Subject, m.Data)
+	return sub
 }
 
 // 参数 subj 为发布信息使用的主题.
