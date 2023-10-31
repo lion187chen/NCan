@@ -4,7 +4,7 @@ go 1.21.3
 
 require (
 	github.com/lion187chen/socketcan-go v1.0.4
-	github.com/lion187chen/waveshare-usb-can-a-go v1.0.3
+	github.com/lion187chen/waveshare-usb-can-a-go v1.0.4
 	github.com/nats-io/nats.go v1.31.0
 )
 
