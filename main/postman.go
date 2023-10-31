@@ -18,15 +18,28 @@ type postman struct {
 	wg        sync.WaitGroup
 }
 
-func (my *postman) init(server, user, passwd, myName, tsubj, rsubj string, can ncandrv.NCanDrvIf) *postman {
-	my.nclient = new(NatsWraper).Init(server, user, passwd, myName)
+func (my *postman) initWithParam(server, user, passwd, name, tsubj, rsubj string, can ncandrv.NCanDrvIf) *postman {
+	my.nclient = new(NatsWraper).Init(server, user, passwd, name)
 
 	my.nclient.Connect()
 	my.toCanChan = make(chan *nats.Msg, 16)
-	// if config == "" {
-	my.tsub = myName + "." + tsubj
-	my.rsub = my.nclient.Subscribe(myName+"."+rsubj, my.toCanChan)
-	// }
+	my.tsub = tsubj
+	my.rsub = my.nclient.Subscribe(rsubj, my.toCanChan)
+
+	my.wg.Add(1)
+	go my.toNats(can)
+	my.wg.Add(1)
+	go my.toCan(can)
+	return my
+}
+
+func (my *postman) initWithConfig(cfg *config, can ncandrv.NCanDrvIf) *postman {
+	my.nclient = new(NatsWraper).Init(cfg.Server, cfg.User, cfg.Passwd, cfg.Name)
+
+	my.nclient.Connect()
+	my.toCanChan = make(chan *nats.Msg, 16)
+	my.tsub = cfg.To
+	my.rsub = my.nclient.Subscribe(cfg.From, my.toCanChan)
 
 	my.wg.Add(1)
 	go my.toNats(can)

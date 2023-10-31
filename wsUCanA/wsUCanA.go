@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 
 	"github.com/lion187chen/NCan/ncandrv"
@@ -9,19 +10,24 @@ import (
 )
 
 type wsUCanA struct {
-	port   string
-	rate   uint
-	ext    bool
-	repeat bool
-	ucan   *wsucana.UsbCanA
+	config
+	ucan *wsucana.UsbCanA
+}
+
+type config struct {
+	Port   string `json:"port"`
+	Rate   uint   `json:"rate"`
+	Ext    bool   `json:"ext"`
+	Repeat bool   `json:"repeat"`
 }
 
 func New() (ncandrv.NCanDrvIf, error) {
 	my := new(wsUCanA)
-	flag.StringVar(&my.port, "port", "/dev/ttyUSB0", "WaveShare USB-CAN-A's virtual serial port name.")
-	flag.UintVar(&my.rate, "rate", 100, "CAN bit rate 5,10,20,50,100,125,200,250,400,500,800,1000.")
-	flag.BoolVar(&my.ext, "ext", true, "Use extended frame.")
-	flag.BoolVar(&my.repeat, "repeat", true, "Auto repeat.")
+	flag.StringVar(&my.Port, "port", "/dev/ttyUSB0", "WaveShare USB-CAN-A's virtual serial port name.")
+	flag.UintVar(&my.Rate, "rate", 100, "CAN bit rate 5,10,20,50,100,125,200,250,400,500,800,1000.")
+	flag.BoolVar(&my.Ext, "ext", true, "Use extended frame.")
+	flag.BoolVar(&my.Repeat, "repeat", true, "Auto repeat.")
+
 	my.ucan = new(wsucana.UsbCanA)
 	return my, nil
 }
@@ -30,8 +36,14 @@ func (my *wsUCanA) Delete() error {
 	return nil
 }
 
-func (my *wsUCanA) Open(name string) error {
-	err := my.ucan.Open(my.port, 16)
+func (my *wsUCanA) Open(name string, config []byte) error {
+	if len(config) != 0 {
+		err := json.Unmarshal(config, &my.config)
+		if err != nil {
+			return err
+		}
+	}
+	err := my.ucan.Open(my.Port, 16)
 	if err != nil {
 		return err
 	}
@@ -39,7 +51,7 @@ func (my *wsUCanA) Open(name string) error {
 	var rate wsucana.BiterateType
 	var ext wsucana.CanFrameType = wsucana.FRAME_CFG_CAN_FRAME_STD
 	var repeat wsucana.RepeatType = wsucana.FRAME_CFG_REPEAT_NO
-	switch my.rate {
+	switch my.Rate {
 	case 5:
 		rate = wsucana.FRAME_CFG_BIT_RATE_5K
 	case 10:
@@ -65,10 +77,10 @@ func (my *wsUCanA) Open(name string) error {
 	default:
 		rate = wsucana.FRAME_CFG_BIT_RATE_100K
 	}
-	if my.ext {
+	if my.Ext {
 		ext = wsucana.FRAME_CFG_CAN_FRAME_EXT
 	}
-	if my.repeat {
+	if my.Repeat {
 		repeat = wsucana.FRAME_CFG_REPEAT_AUTO
 	}
 	my.ucan.Config(rate, ext, wsucana.FRAME_CFG_WRK_MOD_NORMAL, repeat)

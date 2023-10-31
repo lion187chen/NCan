@@ -1,17 +1,9 @@
 {
-    "server": "name:port",
-    "user": "rick",
-    "passwd": "password",
-    "name": "ncan",
-
-    "to": {
-        "main0.sub0.name": ["0b00000001", "0b00100000", "0b.1.0000."],
-        "main1.sub.>": ["0b00000001", "0b.1.0000."],
-        "main2.>": ["0b00000001", "0b.1.0000."]
-    },
-    "from": {
-        "main0.sub0.name": ["0b00000001", "0b.1.0000."],
-        "main1.sub.>": ["0b00000001", "0b.1.0000."],
-        "main2.>": ["0b00000001", "0b.1.0000."]
-    }
+    "server": "192.168.2.15:6666",
+    "user": "ncan",
+    "passwd": "000000",
+    "name": "ncan0",
+    "to": "ncan1",
+    "from": "ncan0",
+    "driver": {   }
 }
