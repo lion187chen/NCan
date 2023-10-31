@@ -24,7 +24,7 @@ func main() {
 	var tsubj string
 	var cfile string
 
-	flag.StringVar(&driver, "driver", "../wsUCanA/wsUCanA.so", "CAN Driver.")
+	flag.StringVar(&driver, "driver", "./wsUCanA.so", "CAN Driver.")
 	flag.StringVar(&server, "server", "127.0.0.1:6666", "NATS server and port.")
 	flag.StringVar(&user, "user", "ncan", "NATS login user name.")
 	flag.StringVar(&passwd, "passwd", "000000", "NATS login password.")
